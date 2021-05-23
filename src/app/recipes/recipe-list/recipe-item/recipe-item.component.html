@@ -1,0 +1,15 @@
+<a style="cursor: pointer;" class="text-link" [routerLink]="[recipe.id]" [routerLinkActive]="'active'">
+  <div class="card mb-3">
+    <div class="row g-0">
+      <div class="col-md-4 recipe-img">
+        <img [src]="recipe.imagePath" />
+      </div>
+      <div class="col-md-8">
+        <div class="card-body">
+          <h5 class="card-title">{{ recipe.name }}</h5>
+          <p class="card-text">{{ recipe.desc }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</a>

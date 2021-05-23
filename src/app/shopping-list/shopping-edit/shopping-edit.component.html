@@ -1,0 +1,50 @@
+<form #ingredientForm="ngForm" (ngSubmit)="onSubmit()">
+  <div class="row">
+    <div class="col-4">
+      <div class="mb-3">
+        <label class="form-label">Name</label>
+        <input
+          type="text"
+          class="form-control"
+          name="name"
+          ngModel
+          required
+          #name="ngModel"
+        />
+        <small *ngIf="!name.valid && name.touched" class="help-text"
+          >Invaild name</small
+        >
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="mb-3">
+        <label class="form-label">Amount</label>
+        <input
+          type="number"
+          class="form-control"
+          name="amount"
+          ngModel
+          required
+          #amount="ngModel"
+          [minlength]="2"
+        />
+        <small *ngIf="!amount.valid && amount.touched" class="help-text"
+          >Invaild amount</small
+        >
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <button
+        type="submit"
+        class="btn btn-primary me-2"
+        [disabled]="!ingredientForm.valid"
+      >
+        {{ editMode ? "Update" : "Add" }}
+      </button>
+      <button type="button" class="btn btn-danger me-2" [disabled]="!editMode"  (click)="onDelete()">Delete</button>
+      <button type="button" class="btn btn-dark me-2" (click)="clearForm()">Clear</button>
+    </div>
+  </div>
+</form>

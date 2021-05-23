@@ -1,0 +1,15 @@
+.recipe-detail-wrapper {
+    background-color: whitesmoke;
+}
+
+.recipe-detail {
+    margin-top: 3em;
+    margin-bottom: 3em;
+
+    img {
+        width: 100%;
+        min-height: 200px;
+        max-height: 250px;
+        object-fit: cover;
+    }
+}

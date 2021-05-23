@@ -1,1 +1,12 @@
-/* You can add global styles to this file, and also import other style files */
+.link-cursor {
+  cursor: pointer !important;
+}
+
+.form-control {
+    border: 2px solid rgba(15,15,15, .15);
+}
+
+.form-control.ng-touched.ng-invalid {
+  border-color: #ff0053 !important;
+  
+}

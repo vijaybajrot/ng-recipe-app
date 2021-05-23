@@ -1,0 +1,43 @@
+<div class="row justify-content-center recipe-detail-wrapper">
+  <div class="col-10">
+    <div class="card recipe-detail">
+      <img [src]="recipe.imagePath" class="card-img-top" alt="..." />
+      <div class="card-body">
+        <h5 class="card-title">
+          {{ recipe.name }}
+          <div class="dropdown mt-2">
+            <a
+              class="btn btn-secondary dropdown-toggle"
+              appDropdown
+              role="button"
+              id="dropdownMenuLink"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              Manage
+            </a>
+            <ul
+              class="dropdown-menu"
+              appDropdown
+              aria-labelledby="dropdownMenuLink"
+            >
+              <li>
+                <a class="dropdown-item link-cursor" [routerLink]="['edit']"
+                  >Edit Recipe</a
+                >
+              </li>
+            </ul>
+          </div>
+        </h5>
+        <p class="card-text">{{ recipe.desc }}</p>
+        <p class="card-text">
+          <span
+            *ngFor="let ingredient of recipe.ingredients"
+            class="badge rounded-pill bg-light text-dark me-2"
+            >{{ ingredient.name }} {{ ingredient.amount }}
+          </span>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
