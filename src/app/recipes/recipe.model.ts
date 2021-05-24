@@ -1,8 +1,10 @@
 import { Ingredient } from "../shopping-list/ingredient.model";
 
 export class Recipe {
+  public id?: string
+
   constructor(
-    public id: string,
+    id = null,
     public name: string,
     public desc: string,
     public imagePath: string,

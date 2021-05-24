@@ -1,6 +1,11 @@
 <div class="row justify-content-center recipe-detail-wrapper">
   <div class="col-10">
-    <div class="card recipe-detail">
+    <div class="d-flex justify-content-center m-5" *ngIf="isFetching">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+    <div class="card recipe-detail" *ngIf="!isFetching">
       <img [src]="recipe.imagePath" class="card-img-top" alt="..." />
       <div class="card-body">
         <h5 class="card-title">
@@ -34,7 +39,7 @@
           <span
             *ngFor="let ingredient of recipe.ingredients"
             class="badge rounded-pill bg-light text-dark me-2"
-            >{{ ingredient.name }} {{ ingredient.amount }}
+            >{{ ingredient.name | toUpper }} {{ ingredient.amount }}
           </span>
         </p>
       </div>

@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
-import { nanoid } from 'nanoid';
 
 import { Recipe } from './../recipe.model';
 import { RecipeService } from './../recipe.service';
@@ -23,6 +22,7 @@ export class RecipeEditComponent implements OnInit {
   recipe!: Recipe;
   editMode: boolean = false;
   recipeForm!: FormGroup;
+  isFetching = true;
 
   constructor(
     private route: ActivatedRoute,
@@ -32,15 +32,16 @@ export class RecipeEditComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.params.subscribe((params) => {
-      const recipe = this.recipeService.getRecipeById(params.id);
-      console.log(recipe);
-      if (recipe) {
-        this.recipe = recipe;
-        this.editMode = true;
-      } else {
-        this.editMode = false;
-      }
-      this.buildForm();
+      this.recipeService.getRecipeById(params.id).subscribe((recipe) => {
+        if (recipe) {
+          this.recipe = recipe;
+          this.editMode = true;
+        } else {
+          this.editMode = false;
+        }
+        this.buildForm();
+        this.isFetching = false;
+      });
     });
   }
 
@@ -58,8 +59,6 @@ export class RecipeEditComponent implements OnInit {
       values.name = this.recipe.name;
       values.desc = this.recipe.desc;
       values.imagePath = this.recipe.imagePath;
-
-      console.log(values);
 
       if (this.recipe.ingredients) {
         for (const ingredient of this.recipe.ingredients) {
@@ -133,32 +132,39 @@ export class RecipeEditComponent implements OnInit {
   onSubmit() {
     const values: RecipeFormValues = this.recipeForm.value;
 
+    console.log('this.recipe', this.recipe);
+
     if (this.editMode === true) {
       this.recipe.name = values.name;
       this.recipe.desc = values.desc;
       this.recipe.imagePath = values.imagePath;
       this.recipe.ingredients = values.ingredients;
+
       // Update
-      this.recipeService.updateRecipe(this.recipe, this.recipe.id);
-      this.router.navigate(['../'], { relativeTo: this.route });
+      this.recipeService.updateRecipe(this.recipe).subscribe(() => {
+        this.router.navigate(['../'], { relativeTo: this.route });
+      });
     } else {
-      const id = nanoid();
       const recipe = new Recipe(
-        id,
+        null,
         values.name,
         values.desc,
         values.imagePath,
         values.ingredients
       );
       // Add
-      this.recipeService.addRecipe(recipe);
-      this.router.navigate(['../', id], { relativeTo: this.route });
+      this.recipeService.addRecipe(recipe).subscribe((recipe) => {
+        console.log('added recipe', recipe);
+        this.router.navigate(['../', recipe.id], { relativeTo: this.route });
+      });
     }
   }
 
   onRemove() {
-    this.recipeService.removeRecipe(this.recipe.id);
-    this.router.navigate(['../../'], { relativeTo: this.route });
+    if (this.recipe.id) {
+      this.recipeService.removeRecipe(this.recipe.id);
+      this.router.navigate(['../../'], { relativeTo: this.route });
+    }
   }
 
   onCancel() {

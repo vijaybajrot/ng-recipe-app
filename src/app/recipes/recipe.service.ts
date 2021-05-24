@@ -1,42 +1,56 @@
+import { HttpClient } from '@angular/common/http';
 import { Subject } from 'rxjs';
 import { Injectable, EventEmitter } from '@angular/core';
 import { Ingredient } from '../shopping-list/ingredient.model';
 import { Recipe } from './recipe.model';
 
-import { nanoid } from 'nanoid';
+import { map, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
 })
 export class RecipeService {
   recipeSelected: EventEmitter<Recipe> = new EventEmitter();
-  recipeChanged: Subject<Recipe[]> = new Subject();
+  recipeChanged: Subject<void> = new Subject();
 
-  private recipes: Recipe[] = [
-    new Recipe(
-      nanoid(),
-      'Rice Pulao',
-      'Pressure cooker, basmati rice, green peas, french beans, star ',
-      'https://www.whiskaffair.com/wp-content/uploads/2019/05/Veg-Pulao-1-3.jpg',
-      [new Ingredient('Jeera', 1), new Ingredient('Ginger', 1)]
-    ),
-    new Recipe(
-      nanoid(),
-      'Matar Pneer',
-      'Cottage cheese, green peas, cream, garam masala, ginger',
-      'https://spicecravings.com/wp-content/uploads/2020/08/Matar-Paneer-2-500x500.jpg',
-      [new Ingredient('Pneer', 1), new Ingredient('Matar', 20)]
-    ),
-  ];
+  private recipes: Recipe[] = [];
 
-  constructor() {}
+  constructor(private http: HttpClient) {}
 
   getRecipes() {
-    return this.recipes.slice();
+    return this.syncRecipes();
+  }
+
+  syncRecipes() {
+    return this.http
+      .get<{ [k: string]: Recipe }>(
+        'https://recipe-ng-app-7891d-default-rtdb.firebaseio.com/recipes.json'
+      )
+      .pipe(
+        map((data) => {
+          const dataArray: Recipe[] = [];
+          for (const id in data) {
+            dataArray.push({ ...data[id], id });
+          }
+          return dataArray;
+        })
+      );
   }
 
   getRecipeById(id: string) {
-    return this.recipes.find((recipe) => recipe.id === id);
+    return this.http
+      .get<Recipe>(
+        `https://recipe-ng-app-7891d-default-rtdb.firebaseio.com/recipes/${id}.json`
+      )
+      .pipe(
+        map((recipe) => {
+          if (recipe) {
+            recipe.id = id;
+            return recipe;
+          }
+          return recipe;
+        })
+      );
   }
 
   selectRecipe(recipe: Recipe) {
@@ -44,24 +58,39 @@ export class RecipeService {
   }
 
   addRecipe(recipe: Recipe) {
-    this.recipes.push(recipe);
-    this.recipeChanged.next(this.recipes);
+    return this.http
+      .post<{ name: string }>(
+        'https://recipe-ng-app-7891d-default-rtdb.firebaseio.com/recipes.json',
+        recipe
+      )
+      .pipe(
+        map((res) => {
+          recipe.id = res.name;
+          return recipe;
+        }),
+        tap((recipe) => {
+          this.recipeChanged.next();
+        })
+      );
   }
 
-  updateRecipe(recipe: Recipe, id: string) {
-    this.recipes = this.recipes.map((recipeItem: Recipe) => {
-      if (recipeItem.id === id) {
-        recipeItem = recipe;
-      }
-      return recipeItem;
-    });
-    this.recipeChanged.next(this.recipes);
+  updateRecipe(recipe: Recipe) {
+    return this.http
+      .put<any>(
+        `https://recipe-ng-app-7891d-default-rtdb.firebaseio.com/recipes/${recipe.id}.json`,
+        recipe
+      )
+      .pipe(
+        tap(() => {
+          this.recipeChanged.next();
+        })
+      );
   }
 
   removeRecipe(id: string) {
     this.recipes = this.recipes.filter((recipeItem: Recipe) => {
       return recipeItem.id !== id;
     });
-    this.recipeChanged.next(this.recipes);
+    this.recipeChanged.next();
   }
 }

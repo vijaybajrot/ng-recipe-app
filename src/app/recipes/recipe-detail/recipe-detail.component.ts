@@ -1,6 +1,7 @@
+import { Recipe } from './../recipe.model';
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Recipe } from '../recipe.model';
+
 import { RecipeService } from '../recipe.service';
 
 @Component({
@@ -10,6 +11,7 @@ import { RecipeService } from '../recipe.service';
 })
 export class RecipeDetailComponent implements OnInit {
   recipe!: Recipe;
+  isFetching = true
 
   constructor(
     private recipeService: RecipeService,
@@ -18,10 +20,10 @@ export class RecipeDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.params.subscribe((params) => {
-      const recipe = this.recipeService.getRecipeById(params.id);
-      if (recipe) {
+      this.recipeService.getRecipeById(params.id).subscribe((recipe: Recipe) => {
         this.recipe = recipe;
-      }
+        this.isFetching = false
+      });
     });
   }
 }

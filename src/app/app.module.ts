@@ -2,6 +2,7 @@ import { RecipeService } from './recipes/recipe.service';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
@@ -16,6 +17,7 @@ import { TextHighlightDirective } from './directives/text-highlight.directive';
 import { EmptyRecipeComponent } from './recipes/empty-recipe/empty-recipe.component';
 import { RecipeEditComponent } from './recipes/recipe-edit/recipe-edit.component';
 import { DropdownDirective } from './directives/dropdown.directive';
+import { UppercasePipe } from './pipes/uppercase.pipe';
 
 @NgModule({
   declarations: [
@@ -31,8 +33,15 @@ import { DropdownDirective } from './directives/dropdown.directive';
     EmptyRecipeComponent,
     RecipeEditComponent,
     DropdownDirective,
+    UppercasePipe,
   ],
-  imports: [BrowserModule, AppRoutingModule, FormsModule, ReactiveFormsModule],
+  imports: [
+    BrowserModule,
+    HttpClientModule,
+    AppRoutingModule,
+    FormsModule,
+    ReactiveFormsModule,
+  ],
   providers: [RecipeService],
   bootstrap: [AppComponent],
 })
