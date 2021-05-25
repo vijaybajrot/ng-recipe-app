@@ -3,8 +3,9 @@ import { Subject } from 'rxjs';
 import { Injectable, EventEmitter } from '@angular/core';
 import { Ingredient } from '../shopping-list/ingredient.model';
 import { Recipe } from './recipe.model';
+import { map, take, tap } from 'rxjs/operators';
 
-import { map, tap } from 'rxjs/operators';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable({
   providedIn: 'root',
@@ -12,10 +13,9 @@ import { map, tap } from 'rxjs/operators';
 export class RecipeService {
   recipeSelected: EventEmitter<Recipe> = new EventEmitter();
   recipeChanged: Subject<void> = new Subject();
-
   private recipes: Recipe[] = [];
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
   getRecipes() {
     return this.syncRecipes();
