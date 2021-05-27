@@ -1,7 +1,6 @@
 import { ShoppingService } from './../shopping.service';
 import {
   Component,
-  ElementRef,
   OnInit,
   Output,
   ViewChild,
@@ -10,6 +9,10 @@ import {
 import { NgForm } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { Ingredient } from '../ingredient.model';
+
+import { Store } from '@ngrx/store';
+import { AddIngredient } from '../store/shopping.actions';
+import { AppState } from 'src/app/store/root.reducer';
 
 @Component({
   selector: 'app-shopping-edit',
@@ -25,7 +28,10 @@ export class ShoppingEditComponent implements OnInit {
   editMode: boolean = false;
   editSubscription!: Subscription;
 
-  constructor(public shoppingService: ShoppingService) {}
+  constructor(
+    public shoppingService: ShoppingService,
+    private store: Store<AppState>
+  ) {}
 
   ngOnInit(): void {
     this.editSubscription = this.shoppingService.$editIngredient.subscribe(
@@ -48,7 +54,8 @@ export class ShoppingEditComponent implements OnInit {
     if (this.editMode === true && this.editIndex !== undefined) {
       this.shoppingService.updateIngredient(item, this.editIndex);
     } else {
-      this.shoppingService.addIngredient(item);
+      // this.shoppingService.addIngredient(item);
+      this.store.dispatch(new AddIngredient(item));
     }
     this.clearForm();
   }

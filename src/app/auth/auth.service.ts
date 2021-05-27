@@ -3,6 +3,10 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { throwError, Subject, BehaviorSubject } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
+import { Store } from '@ngrx/store';
+import { AppState } from '../store/root.reducer';
+
+import * as authActions from '../auth/store/auth.actions';
 
 const KEY = 'AIzaSyCNXO1DBNHiIbzNgC6fpiFLhOf5NwmESwc';
 
@@ -22,7 +26,7 @@ export interface AuthResponse {
 export class AuthService {
   user = new BehaviorSubject<User | null>(null);
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private store: Store<AppState>) {}
 
   register(data: { email: string; password: string }) {
     return this.http
@@ -70,7 +74,16 @@ export class AuthService {
     );
 
     if (user.token) {
-      this.user.next(user);
+      console.log('dispatching to store')
+      // this.user.next(user);
+      this.store.dispatch(
+        new authActions.Login({
+          id: userSnapshot.id,
+          email: userSnapshot.email,
+          token: userSnapshot._token,
+          tokenExpireDate: new Date(userSnapshot._tokenExpDate),
+        })
+      );
     }
   }
 
@@ -95,12 +108,20 @@ export class AuthService {
       response.idToken,
       expiredAt
     );
-    this.user.next(user);
+    // this.user.next(user);
+    this.store.dispatch(
+      new authActions.Login({
+        id: response.localId,
+        email: response.email,
+        token: response.idToken,
+        tokenExpireDate: expiredAt,
+      })
+    );
     localStorage.setItem('user.snapshot', JSON.stringify(user));
   }
 
   logout() {
-    this.user.next(null);
-    localStorage.removeItem('user.snapshot')
+    this.store.dispatch(new authActions.Logout())
+    localStorage.removeItem('user.snapshot');
   }
 }

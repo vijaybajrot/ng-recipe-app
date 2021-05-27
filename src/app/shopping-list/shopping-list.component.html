@@ -4,10 +4,12 @@
     <div class="hr"></div>
     <ul
       class="list-group list-group-flush"
-      *ngFor="let ingredient of ingredients; let i = index"
+      *ngFor="let ingredient of (state$ | async); let i = index"
     >
       <li class="list-group-item">
-        <span (click)="editIngredient(i)" class="link-cursor me-1">{{ ingredient.name }}</span>
+        <span (click)="editIngredient(i)" class="link-cursor me-1">{{
+          ingredient.name
+        }}</span>
         <span class="badge bg-primary rounded-pill">{{
           ingredient.amount
         }}</span>

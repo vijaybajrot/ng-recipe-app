@@ -1,7 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
+import { AppState } from '../store/root.reducer';
 
 @Component({
   selector: 'app-header',
@@ -12,12 +14,19 @@ export class HeaderComponent implements OnInit, OnDestroy {
   userSub!: Subscription;
   isAuth: boolean = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private store: Store<AppState>
+  ) {}
 
   ngOnInit(): void {
-    this.userSub = this.authService.user.subscribe((user) => {
-      this.isAuth = !!user;
-    });
+    this.userSub = this.store
+      .select((store) => store.auth.user)
+      .subscribe((user) => {
+        console.log('user : ', user)
+        this.isAuth = !!user;
+      });
   }
 
   ngOnDestroy(): void {
@@ -25,7 +34,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   onLogout() {
-    this.authService.logout()
-    this.router.navigate(['/auth'])
+    this.authService.logout();
+    this.router.navigate(['/auth']);
   }
 }
