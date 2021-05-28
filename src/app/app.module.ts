@@ -39,7 +39,7 @@ import { AuthInterceptor } from './auth/auth.interceptor';
     AuthComponent,
   ],
   imports: [
-    BrowserModule,
+    BrowserModule.withServerTransition({ appId: 'serverApp' }),
     HttpClientModule,
     AppRoutingModule,
     FormsModule,
