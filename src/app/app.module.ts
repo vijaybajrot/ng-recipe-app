@@ -12,7 +12,11 @@ import { UppercasePipe } from './pipes/uppercase.pipe';
 
 import { AuthInterceptor } from './auth/auth.interceptor';
 import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
 import { rootReducer } from './store/root.reducer';
+import { AuthEffects } from './auth/store/auth.effects';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [
@@ -28,6 +32,8 @@ import { rootReducer } from './store/root.reducer';
     HttpClientModule,
     AppRoutingModule,
     StoreModule.forRoot(rootReducer),
+    EffectsModule.forRoot([AuthEffects]),
+    StoreDevtoolsModule.instrument({logOnly: environment.production}),
   ],
   providers: [
     RecipeService,
