@@ -1,8 +1,9 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { Router } from '@angular/router';
+import { Actions, createEffect, Effect, ofType } from '@ngrx/effects';
 import { EMPTY, of } from 'rxjs';
-import { map, mergeMap, catchError, switchMap } from 'rxjs/operators';
+import { map, tap, catchError, switchMap } from 'rxjs/operators';
 import { User } from '../user.model';
 
 import * as authActions from './auth.actions';
@@ -40,7 +41,8 @@ const handleAuth = (response: AuthResponse) => {
     response.idToken,
     expiredAt
   );
-  // this.user.next(user);
+
+  localStorage.setItem('user.snapshot', JSON.stringify(user));
 
   return new authActions.Login({
     id: response.localId,
@@ -48,7 +50,6 @@ const handleAuth = (response: AuthResponse) => {
     token: response.idToken,
     tokenExpireDate: expiredAt,
   });
-  //localStorage.setItem('user.snapshot', JSON.stringify(user));
 };
 
 @Injectable()
@@ -68,7 +69,7 @@ export class AuthEffects {
           )
           .pipe(
             map((response) => {
-              return handleAuth(response)
+              return handleAuth(response);
             }),
             catchError((errorResponse) => {
               return handleError(errorResponse);
@@ -78,5 +79,20 @@ export class AuthEffects {
     )
   );
 
-  constructor(private actions$: Actions, private http: HttpClient) {}
+  loginSuccess$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(authActions.AuthActionTypes.LOGIN),
+        tap((action: authActions.Login) => {
+          return this.router.navigate(['/']);
+        })
+      ),
+    { dispatch: false }
+  );
+
+  constructor(
+    private actions$: Actions,
+    private http: HttpClient,
+    private router: Router
+  ) {}
 }
